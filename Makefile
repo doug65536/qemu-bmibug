@@ -1,6 +1,7 @@
-SOURCES = main.S
+SOURCES = main.S multiboot.S
 OBJS = $(patsubst %.S,%.o,$(SOURCES))
 QEMU = qemu-system-i386
+MKFIFO = mkfifo
 
 all: qemu-bmibug
 
@@ -18,9 +19,14 @@ qemu-bmibug: $(SOURCES) Makefile kernel.ld
 		-ggdb3 -static -nostdlib \
 		$(SOURCES)
 
-run: qemu-bmibug Makefile
+debug.fifo:
+	$(MKFIFO) debug.fifo
+
+run: qemu-bmibug Makefile debug.fifo
 	$(QEMU) -kernel qemu-bmibug -S -s -cpu max \
 		-chardev socket,id=qemu-monitor,host=localhost,port=7777,server,nowait,telnet \
-		-mon qemu-monitor,mode=readline
+		-mon qemu-monitor,mode=readline \
+		-chardev pipe,path=debug.fifo,id=qemu-debug-out \
+		-device isa-debugcon,chardev=qemu-debug-out
 
 .PHONY: run
