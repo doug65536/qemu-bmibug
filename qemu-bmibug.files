@@ -1,0 +1,4 @@
+./qemu-bmibug.files
+./Makefile
+./main.S
+./kernel.ld
