@@ -55,4 +55,4 @@ attach-gdb:
 		-iex 'target remote localhost:1234' \
 		-ex 'hbreak _start'
 
-.PHONY: run attach-gdb
+.PHONY: run run-kvm debug debug-kvm attach-gdb
