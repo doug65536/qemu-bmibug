@@ -29,13 +29,17 @@ qemu-bmibug: $(SOURCES) Makefile kernel.ld
 run: qemu-bmibug Makefile
 	$(QEMU) -kernel qemu-bmibug -s -cpu max \
 		$(QEMU_CHARDEVS)
-	$(GREP) '1' debug.out
+	$(GREP) '1' debug.out && \
+		printf '*** Passed\n' || \
+		(printf 'XXX Failed!\n'; exit 1)
 
 run-kvm: qemu-bmibug Makefile
 	$(QEMU) -kernel qemu-bmibug -s -cpu max \
 		-enable-kvm \
 		$(QEMU_CHARDEVS)
-	$(GREP) '1' debug.out
+	$(GREP) '1' debug.out && \
+		printf '*** Passed\n' || \
+		(printf 'XXX Failed!\n'; exit 1)
 
 debug: qemu-bmibug Makefile
 	$(QEMU) -kernel qemu-bmibug -S -s -cpu max \
