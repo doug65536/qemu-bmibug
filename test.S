@@ -12,7 +12,7 @@
 
 .section .rodata
 message_txt\@:
-	.asciz \message
+	.asciz "\message"
 
 .section .text
 
