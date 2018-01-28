@@ -34,7 +34,7 @@ _start:
 	push $idt_00
 	push $((32 * 8 - 1) << 16)
 	lidt 2(%esp)
-	add $16,%esp
+	add $8,%esp
 
 start_test:
 	mov $1,%eax
