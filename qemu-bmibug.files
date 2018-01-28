@@ -1,3 +1,5 @@
+test.S
+boot.S
 multiboot.S
 ./qemu-bmibug.files
 ./Makefile

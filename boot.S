@@ -1,7 +1,6 @@
-
+.code32
 .section .text
 
-.code32
 .global _start
 _start:
 	// Setup stack ASAP
@@ -36,58 +35,9 @@ _start:
 	lidt 2(%esp)
 	add $8,%esp
 
-start_test:
-	mov $1,%eax
-	mov %eax,%edx
-	mov $0,%ebx
-.Lnext:
-	// ebx = shift_count
-	// eax = 1
-	// ecx should become 1 << shift_count
-	// edx = expected result
-	shlx %ebx,%eax,%ecx
-	cmp $0,failed
-	jne .Lfail
-	cmp %ecx,%edx
-	jne .Lfail
-	shl $1,%edx
-	add $1,%ebx
-	cmp $32,%ebx
-	jb .Lnext
-
-	// Write '1' to port e9
-	mov $0x31,%al
-	out %al,$0xe9
-	jmp .Lpoweroff
-
-.Lfail:
-	// Write '0' to port e9
-	mov $0x30,%al
-	out %al,$0xe9
-
-.Lpoweroff:
-	// Write newline to port e9
-	mov $0xA,%al
-	out %al,$0xe9
-
-	mov $0x604,%edx
-	mov $0x2000,%eax
-	out %ax,%dx
-	jmp .Lpoweroff
-
-intr_6_opcode:
-	// Set failure flag
-	movl $1,failed
-
-	// Fixup return address
-	// (because invalid opcode returns to faulting instruction)
-	movl $.Lfail,(%esp)
-	iretl
+	jmp start_test
 
 .section .data
-
-failed: .int 0
-
 .align 16
 idt_00: .int 0, 0
 idt_01: .int 0, 0
@@ -123,26 +73,26 @@ idt_1E: .int 0, 0
 idt_1F: .int 0, 0
 
 gdt:
-.short 0
+	.short 0
 gdtr:
-.short gdt_en - gdt - 1
-.int gdt
+	.short gdt_en - gdt - 1
+	.int gdt
 
-// Code
-.short 0xFFFF
-.short 0
-.byte 0
-.byte 0x9b
-.byte 0xCF
-.byte 0
+	// Code
+	.short 0xFFFF
+	.short 0
+	.byte 0
+	.byte 0x9b
+	.byte 0xCF
+	.byte 0
 
-// Data
-.short 0xFFFF
-.short 0
-.byte 0
-.byte 0x93
-.byte 0xCF
-.byte 0
+	// Data
+	.short 0xFFFF
+	.short 0
+	.byte 0
+	.byte 0x93
+	.byte 0xCF
+	.byte 0
 
 gdt_en:
 

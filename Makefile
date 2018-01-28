@@ -1,4 +1,4 @@
-SOURCES = main.S multiboot.S
+SOURCES = multiboot.S boot.S test.S
 OBJS = $(patsubst %.S,%.o,$(SOURCES))
 QEMU = qemu-system-i386
 MKFIFO = mkfifo
