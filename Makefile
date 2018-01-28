@@ -3,6 +3,7 @@ OBJS = $(patsubst %.S,%.o,$(SOURCES))
 QEMU = qemu-system-i386
 MKFIFO = mkfifo
 GREP = grep
+CAT = cat
 
 QEMU_CHARDEVS = \
 	-chardev socket,id=qemu-monitor,host=localhost,port=7777,server,nowait,telnet \
@@ -29,17 +30,17 @@ qemu-bmibug: $(SOURCES) Makefile kernel.ld
 run: qemu-bmibug Makefile
 	$(QEMU) -kernel qemu-bmibug -s -cpu max \
 		$(QEMU_CHARDEVS)
-	$(GREP) '1' debug.out && \
+	$(GREP) 'Passed' debug.out && \
 		printf '*** Passed\n' || \
-		(printf 'XXX Failed!\n'; exit 1)
+		(printf 'XXX Failed!\n'; $(CAT) debug.out; exit 1)
 
 run-kvm: qemu-bmibug Makefile
 	$(QEMU) -kernel qemu-bmibug -s -cpu max \
 		-enable-kvm \
 		$(QEMU_CHARDEVS)
-	$(GREP) '1' debug.out && \
+	$(GREP) 'Passed' debug.out && \
 		printf '*** Passed\n' || \
-		(printf 'XXX Failed!\n'; exit 1)
+		(printf 'XXX Failed!\n'; $(CAT) debug.out; exit 1)
 
 debug: qemu-bmibug Makefile
 	$(QEMU) -kernel qemu-bmibug -S -s -cpu max \

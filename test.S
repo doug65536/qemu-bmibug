@@ -5,10 +5,10 @@
 	xor %ecx,%ecx
 	mov $\val,%eax
 	mov $\shf,%ebx
-	\instr %ebx,%eax,%ecx
 	mov $message_txt\@,%esi
+	\instr %ebx,%eax,%ecx
 	cmp $\expect,%ecx
-	jnz .Lfail_with_message
+	jnz .Lexit_with_message
 
 .section .rodata
 message_txt\@:
@@ -18,26 +18,35 @@ message_txt\@:
 
 .endm
 
+.section .rodata
+pass_txt:
+	.asciz "Passed"
+
+.section .text
+
 .global start_test
 start_test:
+	push invalid_opcode_handler
+	movl $.Lexit_with_message,invalid_opcode_handler
+
 	test_shiftx shlx, 4, 0x87654321, 0x76543210, "shlx failed"
 	test_shiftx shrx, 4, 0x87654321, 0x08765432, "shrx failed"
 	test_shiftx sarx, 4, 0x87654321, 0xF8765432, "sarx failed"
 
+	pop invalid_opcode_handler
+
 	// Passed
 
 	// Write '1' to port e9
-	mov $0x31,%al
-	out %al,$0xe9
-	jmp .Lpoweroff
+	mov $pass_txt,%esi
 
-.Lfail_with_message:
+.Lexit_with_message:
 	mov (%esi),%al
 	test %al,%al
 	jz .Lpoweroff
 	out %al,$0xE9
 	add $1,%esi
-	jmp .Lfail_with_message
+	jmp .Lexit_with_message
 
 .Lfail:
 	// Write '0' to port e9
@@ -61,8 +70,10 @@ start_test:
 intr_6_opcode:
 	// Fixup return address
 	// (because invalid opcode returns to faulting instruction)
-	push invalid_opcode_handler
-	pop 4(%esp)
+	pushl %eax
+	movl invalid_opcode_handler,%eax
+	mov %eax,4(%esp)
+	popl %eax
 	iretl
 
 .section .data
