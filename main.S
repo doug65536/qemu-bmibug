@@ -48,7 +48,7 @@ start_test:
 	shlx %ebx,%eax,%ecx
 	cmp $0,failed
 	jne .Lfail
-	cmp %eax,%edx
+	cmp %ecx,%edx
 	jne .Lfail
 	shl $1,%edx
 	add $1,%ebx
@@ -66,6 +66,10 @@ start_test:
 	out %al,$0xe9
 
 .Lpoweroff:
+	// Write newline to port e9
+	mov $0xA,%al
+	out %al,$0xe9
+
 	mov $0x604,%edx
 	mov $0x2000,%eax
 	out %ax,%dx
