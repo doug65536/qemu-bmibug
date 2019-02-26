@@ -5,8 +5,9 @@ Repro for qemu tcg bmi decoder failure
 
 [Launchpad bug #1748296](https://bugs.launchpad.net/qemu/+bug/1748296)
 
-
 == License
+
+<pre>
 
 // This file is part of qemu-bmibug.
 //
@@ -22,5 +23,5 @@ Repro for qemu tcg bmi decoder failure
 //
 //    You should have received a copy of the GNU General Public License
 //    along with Foobar.  If not, see <https://www.gnu.org/licenses/>.
-
+</pre>
 
