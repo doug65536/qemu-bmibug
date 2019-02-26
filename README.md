@@ -1,7 +1,7 @@
 # qemu-bmibug
 Repro for qemu tcg bmi decoder failure
 
-[Doug Gale @ github](https://www.github/com/doug65536)
+[Doug Gale @ github](https://www.github.com/doug65536)
 
 [Launchpad bug #1748296](https://bugs.launchpad.net/qemu/+bug/1748296)
 
