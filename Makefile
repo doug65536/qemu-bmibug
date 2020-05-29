@@ -1,3 +1,5 @@
+.SUFFIXES:
+
 SOURCES = multiboot.S boot.S test.S
 OBJS = $(patsubst %.S,%.o,$(SOURCES))
 QEMU = qemu-system-i386
@@ -21,21 +23,22 @@ clean:
 
 qemu-bmibug: $(SOURCES) Makefile kernel.ld
 	$(CXX) -o $@ \
+		-fno-PIC \
 		-Wl,-Tkernel.ld \
 		-Wl,-melf_i386 \
 		-m32 \
-		-ggdb3 -static -nostdlib \
+		-ggdb3 -static -nostdlib -ffreestanding \
 		$(SOURCES)
 
 run: qemu-bmibug Makefile
-	$(QEMU) -kernel qemu-bmibug -s -cpu max \
+	$(QEMU) -kernel qemu-bmibug -s -cpu max,+bmi1,+bmi2 \
 		$(QEMU_CHARDEVS)
 	$(GREP) 'Passed' debug.out && \
 		printf '*** Passed\n' || \
 		(printf 'XXX Failed!\n'; $(CAT) debug.out; exit 1)
 
 run-kvm: qemu-bmibug Makefile
-	$(QEMU) -kernel qemu-bmibug -s -cpu max \
+	$(QEMU) -kernel qemu-bmibug -s -cpu max,+bmi1,+bmi2 \
 		-enable-kvm \
 		$(QEMU_CHARDEVS)
 	$(GREP) 'Passed' debug.out && \
@@ -43,11 +46,11 @@ run-kvm: qemu-bmibug Makefile
 		(printf 'XXX Failed!\n'; $(CAT) debug.out; exit 1)
 
 debug: qemu-bmibug Makefile
-	$(QEMU) -kernel qemu-bmibug -S -s -cpu max \
+	$(QEMU) -kernel qemu-bmibug -S -s -cpu max,+bmi1,+bmi2 \
 		$(QEMU_CHARDEVS)
 
 debug-kvm: qemu-bmibug Makefile
-	$(QEMU) -kernel qemu-bmibug -S -s -cpu max \
+	$(QEMU) -kernel qemu-bmibug -S -s -cpu max,+bmi1,+bmi2 \
 		-enable-kvm \
 		$(QEMU_CHARDEVS)
 

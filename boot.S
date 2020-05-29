@@ -10,12 +10,22 @@ _start:
 	lgdt gdtr
 	ljmp $0x8,$.Lloadcs
 .Lloadcs:
-	mov $0x10,%eax
-	mov %eax,%ds
-	mov %eax,%es
-	mov %eax,%fs
-	mov %eax,%gs
-	mov %eax,%ss
+	movl $0x10,%eax
+	movw %ax,%ds
+	movw %ax,%es
+	movw %ax,%fs
+	movw %ax,%gs
+	movw %ax,%ss
+
+    // Fixup TLS descriptor
+    movl $tls_middle,%eax
+    movw %ax,tls_base_15_0
+    shrl $16,%eax
+    movb %al,tls_base_23_16
+    shrl $8,%eax
+    movb %al,tls_base_31_24
+    movl $0x18,%eax
+    movw %ax,%gs
 
 	// Fixup the IDT to the ridiculous i386 layout
 	xor %ebx,%ebx
@@ -94,9 +104,25 @@ gdtr:
 	.byte 0xCF
 	.byte 0
 
+    // TLS
+    .short 0xFFFF
+	tls_base_15_0: .short 0
+	tls_base_23_16: .byte 0
+	.byte 0x93
+	.byte 0xCF
+	tls_base_31_24: .byte 0
 gdt_en:
 
 .section .bss
 .align 16
 stack: .space 65536
 stack_end:
+
+.global tls_bottom
+.global tls_middle
+.global tls_end
+tls_bottom:
+.space 8192
+tls_middle:
+.space 8192
+tls_end:
