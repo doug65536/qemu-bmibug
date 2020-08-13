@@ -21,19 +21,19 @@
 
 .global _start
 _start:
-	// Setup stack ASAP
-	mov $stack_end,%esp
+    // Setup stack ASAP
+    mov $stack_end,%esp
 
-	// Load GDT ASAP
-	lgdt gdtr
-	ljmp $0x8,$.Lloadcs
+    // Load GDT ASAP
+    lgdt gdtr
+    ljmp $0x8,$.Lloadcs
 .Lloadcs:
-	movl $0x10,%eax
-	movw %ax,%ds
-	movw %ax,%es
-	movw %ax,%fs
-	movw %ax,%gs
-	movw %ax,%ss
+    movl $0x10,%eax
+    movw %ax,%ds
+    movw %ax,%es
+    movw %ax,%fs
+    movw %ax,%gs
+    movw %ax,%ss
 
     // Fixup TLS descriptor
     movl $tls_middle,%eax
@@ -45,25 +45,25 @@ _start:
     movl $0x18,%eax
     movw %ax,%gs
 
-	// Fixup the IDT to the ridiculous i386 layout
-	xor %ebx,%ebx
+    // Fixup the IDT to the ridiculous i386 layout
+    xor %ebx,%ebx
 .Lnextidt:
-	mov idt_00(,%ebx,8),%eax
-	shr $16,%eax
-	movw $0x8,idt_00+2(,%ebx,8)
-	movw $0x8E00,idt_00+4(,%ebx,8)
-	movw %ax,idt_00+6(,%ebx,8)
-	add $1,%ebx
-	cmp $32,%ebx
-	jl .Lnextidt
+    mov idt_00(,%ebx,8),%eax
+    shr $16,%eax
+    movw $0x8,idt_00+2(,%ebx,8)
+    movw $0x8E00,idt_00+4(,%ebx,8)
+    movw %ax,idt_00+6(,%ebx,8)
+    add $1,%ebx
+    cmp $32,%ebx
+    jl .Lnextidt
 
-	// Load IDTR
-	push $idt_00
-	push $((32 * 8 - 1) << 16)
-	lidt 2(%esp)
-	add $8,%esp
+    // Load IDTR
+    push $idt_00
+    push $((32 * 8 - 1) << 16)
+    lidt 2(%esp)
+    add $8,%esp
 
-	jmp start_test
+    jmp start_test
 
 .section .data
 .align 16
@@ -101,34 +101,34 @@ idt_1E: .int 0, 0
 idt_1F: .int 0, 0
 
 gdt:
-	.short 0
+    .short 0
 gdtr:
-	.short gdt_en - gdt - 1
-	.int gdt
+    .short gdt_en - gdt - 1
+    .int gdt
 
-	// Code
-	.short 0xFFFF
-	.short 0
-	.byte 0
-	.byte 0x9b
-	.byte 0xCF
-	.byte 0
+    // Code
+    .short 0xFFFF
+    .short 0
+    .byte 0
+    .byte 0x9b
+    .byte 0xCF
+    .byte 0
 
-	// Data
-	.short 0xFFFF
-	.short 0
-	.byte 0
-	.byte 0x93
-	.byte 0xCF
-	.byte 0
+    // Data
+    .short 0xFFFF
+    .short 0
+    .byte 0
+    .byte 0x93
+    .byte 0xCF
+    .byte 0
 
     // TLS
     .short 0xFFFF
-	tls_base_15_0: .short 0
-	tls_base_23_16: .byte 0
-	.byte 0x93
-	.byte 0xCF
-	tls_base_31_24: .byte 0
+    tls_base_15_0: .short 0
+    tls_base_23_16: .byte 0
+    .byte 0x93
+    .byte 0xCF
+    tls_base_31_24: .byte 0
 gdt_en:
 
 .section .bss
